@@ -8,17 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final String createUsersTableSql = "CREATE TABLE IF NOT EXISTS USERS ("
+    private static final String CREATE_USERS_TABLE_SQL = "CREATE TABLE IF NOT EXISTS USERS ("
             + "ID INT NOT NULL AUTO_INCREMENT, "
             + "NAME VARCHAR(45) NOT NULL,"
             + "LASTNAME VARCHAR(45) NOT NULL, "
             + "AGE INT(3) NOT NULL, "
             + "PRIMARY KEY (ID))";
-    private final String dropUsersTableSql = "DROP TABLE IF EXISTS USERS";
-    private final String saveUserSql = "INSERT INTO USERS (NAME, LASTNAME, AGE) VALUES (?, ?, ?)";
-    private final String removeUserByIdSql = "DELETE FROM USERS WHERE ID = ?";
-    private final String getAllUsersSql = "SELECT * FROM USERS";
-    private final String cleanUsersTableSql = "TRUNCATE USERS";
+    private static final String DROP_USERS_TABLE_SQL = "DROP TABLE IF EXISTS USERS";
+    private static final String SAVE_USER_SQL = "INSERT INTO USERS (NAME, LASTNAME, AGE) VALUES (?, ?, ?)";
+    private static final String REMOVE_USER_BY_ID_SQL = "DELETE FROM USERS WHERE ID = ?";
+    private static final String GET_ALL_USERS_SQL = "SELECT * FROM USERS";
+    private static final String CLEAN_USERS_TABLE_SQL = "TRUNCATE USERS";
 
     public UserDaoJDBCImpl() {
 
@@ -27,7 +27,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void createUsersTable() {
         Connection connection = Util.getConnection();
         try (connection; Statement statement = connection.createStatement()) {
-            statement.execute(createUsersTableSql);
+            statement.execute(CREATE_USERS_TABLE_SQL);
             connection.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -37,7 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         Connection connection = Util.getConnection();
         try (connection; Statement statement = connection.createStatement()) {
-            statement.execute(dropUsersTableSql);
+            statement.execute(DROP_USERS_TABLE_SQL);
             connection.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -46,7 +46,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         Connection connection = Util.getConnection();
-        try (connection; PreparedStatement preparedStatement = connection.prepareStatement(saveUserSql)) {
+        try (connection; PreparedStatement preparedStatement = connection.prepareStatement(SAVE_USER_SQL)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
@@ -65,7 +65,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         Connection connection = Util.getConnection();
-        try (connection; PreparedStatement preparedStatement = connection.prepareStatement(removeUserByIdSql)) {
+        try (connection; PreparedStatement preparedStatement = connection.prepareStatement(REMOVE_USER_BY_ID_SQL)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             connection.commit();
@@ -83,7 +83,7 @@ public class UserDaoJDBCImpl implements UserDao {
         Connection connection = Util.getConnection();
         List<User> userList = new ArrayList<>();
         try (connection; Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(getAllUsersSql)) {
+             ResultSet resultSet = statement.executeQuery(GET_ALL_USERS_SQL)) {
             while (resultSet.next()) {
                 userList.add(new User(resultSet.getString("NAME"),
                         resultSet.getString("LASTNAME"),
@@ -104,7 +104,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         Connection connection = Util.getConnection();
         try (connection; Statement statement = connection.createStatement()) {
-            statement.execute(cleanUsersTableSql);
+            statement.execute(CLEAN_USERS_TABLE_SQL);
             connection.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
